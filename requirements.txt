@@ -36,7 +36,7 @@ cryptography==37.0.1
 cx-Oracle==8.3.0
 cycler==0.11.0
 cymem==2.0.8
-cytoolz==0.12.1
+cytoolz>=0.12.3a2
 dash==2.13.0
 dash-core-components==2.0.0
 dash-html-components==2.0.0
@@ -190,6 +190,7 @@ pypiwin32==223
 Pyro4==4.81
 pyrsistent==0.19.3
 pytailwindcss==0.1.4
+python_version>="3.12"
 python-dateutil==2.8.2
 python-decouple==3.6
 python-dotenv==1.0.1
