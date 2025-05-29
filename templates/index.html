@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PC Builder Assistant</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <div class="container py-5">
+    <div class="hero-section">
+      <h1>🔧 PC Builder Assistant</h1>
+      <p class="lead">Get optimized PC builds with real-time pricing</p>
+    </div>
+
+    <form method="POST" class="mb-4">
+      <div class="row justify-content-center">
+        <div class="col-12 col-sm-8 col-lg-6">
+          <textarea
+            class="form-control form-control-lg mb-2"
+            name="content"
+            rows="2"
+            placeholder="What kind of PC are you looking for? (e.g., 'Budget PC under ₹40,000')"
+            required
+            style="min-height: auto; padding: 1rem;"
+          >{{ user_input }}</textarea>
+          <button class="btn btn-primary btn-lg w-100" type="submit">
+            Build Now →
+          </button>
+        </div>
+      </div>
+    </form>
+
+    {% if error %}
+    <div class="alert alert-warning mt-4" role="alert">
+      <strong>⚠️ {{ error }}</strong>
+      <div class="mt-2">
+        <span>Example valid requests:</span>
+        <ul class="mb-0">
+          <li>Gaming PC under ₹50,000</li>
+          <li>Office PC for programming</li>
+          <li>Budget workstation for video editing</li>
+        </ul>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if components %}
+    <div class="row">
+      {% set part_icon_map = {
+        'cpu': 'bi-cpu', 'motherboard': 'bi-hdd', 'ram': 'bi-memory',
+        'storage': 'bi-device-ssd', 'graphics card': 'bi-gpu-card',
+        'gpu': 'bi-gpu-card', 'power supply': 'bi-plug', 'psu': 'bi-plug',
+        'cabinet': 'bi-pc', 'case': 'bi-pc', 'cooler': 'bi-fan',
+        'cpu cooler': 'bi-fan', 'ssd': 'bi-device-ssd', 'hdd': 'bi-hdd',
+        'monitor': 'bi-display', 'keyboard': 'bi-keyboard', 'mouse': 'bi-mouse'
+      } %}
+      {% for component in components %}
+      <div class="col-12 col-sm-6 col-md-4 mb-4 d-flex align-items-stretch">
+        <div class="component-card w-100 text-center">
+          <i class="bi {{ part_icon_map.get(component.part|lower|trim, 'bi-question-circle') }} part-image"></i>
+          <h5>{{ component.part }}</h5>
+          <div class="model">{{ component.model }}</div>
+          <div class="price">{{ component.price }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="row justify-content-center mt-4">
+  <div class="col-md-10">
+    <div class="summary-box">
+      {% if total_price %}
+        <div class="total-price">Total Price: {{ total_price }}</div>
+      {% endif %}
+      {% if summary %}
+        <div class="summary-text">{{ summary }}</div>
+      {% endif %}
+      <div class="trusted-disclaimer text-center mt-3">
+        <small>Buy the components from trusted sources only.</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+    {% endif %}
+  </div>
+</body>
+</html>
