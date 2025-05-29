@@ -1,4 +1,3 @@
-/* Base Theme Colors (Dark + Cyan/Blue) */
 :root {
   --primary: #00c8ff;
   --primary-dark: #0095c7;
@@ -11,19 +10,20 @@
   --border: #2a3b4c;
   --warning: #ff7043;
 }
+
 body {
   background-color: var(--bg-dark);
   color: var(--text-light);
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   min-height: 100vh;
 }
+
 .container {
-  max-width: 1200px;
+  max-width: 900px;
   padding-top: 2rem;
   padding-bottom: 3rem;
 }
 
-/* Hero Section */
 .hero-section {
   text-align: center;
   margin-bottom: 2.5rem;
@@ -31,7 +31,9 @@ body {
   background: linear-gradient(145deg, var(--bg-darker), var(--bg-dark));
   border-radius: 1rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  max-width: 100%;
 }
+
 .hero-section h1 {
   font-size: 3rem;
   color: var(--primary);
@@ -39,66 +41,78 @@ body {
   font-weight: 600;
   letter-spacing: -0.03em;
 }
+
 .hero-section p {
   color: var(--text-muted);
   font-size: 1.1rem;
   margin-bottom: 0;
 }
 
-/* Input Group */
-.input-group {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  border-radius: 1rem;
-  overflow: hidden;
+.input-area-wrapper {
+  max-width: 100%;
+  margin: 0 auto 2rem auto;
 }
-.input-group textarea {
+
+.input-area-card {
+  background: var(--bg-light);
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  padding: 2rem 2rem 1.5rem 2rem;
+  width: 100%;
+}
+
+.input-area-card textarea {
   resize: vertical;
   font-size: 1.25rem;
-  background-color: var(--bg-light);
+  background-color: var(--bg-dark);
   color: var(--text-light);
   border: 1px solid var(--border);
-  min-height: auto;
+  min-height: 120px;
   padding: 1rem;
   border-radius: 1rem !important;
-  border-right: 1px solid var(--border) !important;
+  width: 100%;
+  margin-bottom: 1rem;
 }
-.input-group textarea:focus {
-  background-color: var(--bg-light);
+
+.input-area-card textarea:focus {
+  background-color: var(--bg-dark);
   color: var(--text-light);
   border-color: var(--primary);
   box-shadow: 0 0 0 0.2rem rgba(0, 200, 255, 0.25);
 }
-.input-group .btn-primary {
+
+.input-area-card .btn-primary {
   background-color: var(--primary);
   border: none;
   border-radius: 1rem !important;
   font-size: 1.1rem;
   font-weight: 500;
   transition: background-color 0.3s, transform 0.2s;
-  padding: 0 2rem;
+  padding: 0.75rem 2rem;
+  width: 100%;
 }
-.input-group .btn-primary:hover {
+
+.input-area-card .btn-primary:hover {
   background-color: var(--primary-dark);
   transform: translateY(-2px);
 }
 
-/* Loading screen styles */
-    #loading-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
+/* Loading overlay styles */
+#loading-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
 .loading-spinner {
-      width: 3rem;
-      height: 3rem;
-    }
+  width: 3rem;
+  height: 3rem;
+}
+
 /* Component Cards */
 .component-card {
   background: var(--bg-light);
@@ -198,4 +212,32 @@ body {
 }
 .mb-0 {
   margin-bottom: 0 !important;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .container, .hero-section, .input-area-card {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  .input-area-card {
+    padding: 1rem 0.5rem 1rem 0.5rem;
+  }
+}
+
+.pc-image-wrapper {
+  max-width: 900px;
+  margin: 0 auto 1.5rem auto;
+  text-align: center;
+}
+
+.pc-image {
+  width: 100%;         /* Fills the wrapper */
+  max-width: 400px;    /* Try 400px, 500px, or even higher as you like */
+  height: auto;
+  border-radius: 1rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  background: #1a2a3a;
+  padding: 0.5rem;
+  display: inline-block;
 }

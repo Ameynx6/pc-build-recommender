@@ -14,20 +14,57 @@ client = OpenAI(api_key=PERPLEXITY_API_KEY, base_url="https://api.perplexity.ai"
 
 SYSTEM_PROMPT = (
     "You are a PC builder. Follow STRICTLY:\n"
-    "give monitor recommendation only if asked. "
-    "if ai is mentioned suggest core ultra series"
-    "try to utilise full budget"
-    "always focus on more value for money builds if user has not mentioned what type of build he wants. "
-    "1. If budget < ₹10,000 or request is unrelated to PCs, respond with:\n"
-    "   {'error': 'Invalid request: [reason]'}\n"
-    "2. Valid builds must include: CPU, Motherboard, RAM, Storage, PSU, Case\n"
-    "3. Prices must be realistic (check current Indian market)\n"
-    "Respond STRICTLY in this JSON format: "
-    "note that if user has not mentioned currency type treat it as Indian rupee. "
-    '{"components": [{"part":"...", "model":"...", "price":"₹...", "part_image":"emoji"}], '
-    '"summary": "...", "total_price": "₹..."} '
-    "Use double quotes ONLY. No markdown. Only valid JSON."
+    '"stricty give response like'
+    "Response Format:\n"
+    '''{
+  "components": [
+    {"part": "CPU", "model": "AMD Ryzen 7 7800X3D", "price": "₹37,500", "part_image": "💻"},
+    {"part": "GPU", "model": "ZOTAC RTX 5080 Trinity", "price": "₹1,12,000", "part_image": "🖥️"},
+    {"part": "Motherboard", "model": "MSI B650 Tomahawk WiFi", "price": "₹22,000", "part_image": "🖥️"},
+    {"part": "RAM", "model": "32GB Corsair Vengeance DDR5-6000", "price": "₹19,800", "part_image": "📦"},
+    {"part": "Storage", "model": "1TB WD Black SN850X", "price": "₹8,200", "part_image": "💾"},
+    {"part": "PSU", "model": "Deepcool PM850D 850W Gold", "price": "₹7,800", "part_image": "🔌"},
+    {"part": "Case", "model": "Lian Li Lancool 216", "price": "₹8,500", "part_image": "📦"}
+  ],
+  "summary": "High-performance gaming PC...",
+  "total_price": "₹2,15,800"
+}'''
+    "1. Core Components (MUST include all 6):\n"
+    "   - CPU\n"
+    "   - Motherboard\n"
+    "   - RAM\n"
+    "   - Storage\n"
+    "   - PSU\n"
+    "   - Case\n"
+    "2. GPU Rules:\n"
+    "   - Budget ≥₹3,00,000: RTX 5090 (₹3.3L-₹4.0L)\n"
+    "   - Budget ≥₹1,50,000: RTX 5080 (₹1.0L-₹1.6L)\n"
+    "   - Budget ≥₹80,000: RTX 5070 Ti\n"
+    "   - Never suggest RTX 5090 below ₹3,30,000\n"
+    "3. CPU Cooler Rules:\n"
+    "   - Budget ≥₹1,00,000: Include 360mm AIO\n"
+    "   - Budget ≥₹50,000: Include air cooler\n"
+    "   - Budget <₹50,000: Use stock cooler (do not list)\n"
+    "4. Accessories:\n"
+    "   - Add monitor/keyboard/mouse ONLY if mentioned\n"
+    "   - Never include OS/licenses unless explicitly asked\n"
+    "5. Price Guidelines (Indian Market):\n"
+    "   - RTX 5090: ₹3,30,000-₹4,00,000\n"
+    "   - RTX 5080: ₹1,00,000-₹1,60,000\n"
+    "   - RTX 5070 Ti: ₹80,000-₹1,00,000\n"
+    "   - DDR5 32GB: ₹18,000-₹25,000\n"
+    "   - 1TB Gen4 SSD: ₹7,000-₹9,000\n"
+    
+    "\nStrict Rules:\n"
+    "- Use ONLY double quotes\n"
+    "- Prices MUST match current Indian rates\n"
+    "- Never exceed stated budget\n"
+    "- part_image emojis: 💻(CPU), 🖥️(MB/GPU), 📦(RAM/Case), 💾(Storage), 🔌(PSU), ❄️(Cooler)\n"
+    "- If error occurs, return {'error':'...'} with reason"
 )
+
+
+
 
 def clean_json_response(raw_response):
     clean = re.sub(r'``````', '', raw_response)
@@ -36,41 +73,54 @@ def clean_json_response(raw_response):
     clean = clean.replace("'", '"')
     return clean.strip()
 
+
 def validate_pc_request(user_input):
-    budget_match = re.search(
-        r'(?:₹|rs|inr)?\s*([\d,]+)(?:\.\d+)?\s*(lac|lakh|lacs|k|thousand|cr|crore|crores|million|billion)?',
-        user_input,
-        re.IGNORECASE
+    # Improved budget detection that requires currency or budget keywords
+    budget_pattern = (
+        r'(?:budget|under|around|₹|rs|inr)\s*'  # Requires budget-related keywords
+        r'(\d[\d,]*)'  # Amount with optional commas
+        r'\s*(lac|lakh|lacs|k|thousand|cr|crore|crores|million|billion)?\b'
     )
+    budget_match = re.search(budget_pattern,user_input,re.IGNORECASE)
+
     min_budget = 10000
+    detected_budget = None
 
     if budget_match:
-        amount_str = budget_match.group(1).replace(',', '')  # Remove commas
+        amount_str = budget_match.group(1).replace(',','')
         suffix = (budget_match.group(2) or '').lower()
 
-        # Convert to numeric value
-        amount = float(amount_str)
-        if suffix in ['lac', 'lakh', 'lacs']:
-            amount *= 100000
-        elif suffix in ['k', 'thousand']:
-            amount *= 1000
-        elif suffix in ['cr', 'crore', 'crores']:
-            amount *= 10000000
-        elif suffix == 'million':
-            amount *= 1000000
-        elif suffix == 'billion':
-            amount *= 1000000000
+        try:
+            amount = float(amount_str)
+            # Convert suffixes to actual values
+            multiplier = 1
+            if suffix in ['lac','lakh','lacs']:
+                multiplier = 100000
+            elif suffix in ['k','thousand']:
+                multiplier = 1000
+            elif suffix in ['cr','crore','crores']:
+                multiplier = 10000000
+            elif suffix == 'million':
+                multiplier = 1000000
+            elif suffix == 'billion':
+                multiplier = 1000000000
 
-        budget = int(amount)
-        if budget < min_budget:
-            return False, f"Budget must be at least ₹{min_budget:,}"
-    else:
-        return False, "Could not detect valid budget amount"
+            detected_budget = int(amount * multiplier)
 
-    pc_keywords = r'\b(PC|computer|build|gaming|workstation|cpu|gpu|ram|motherboard)\b'
-    if not re.search(pc_keywords, user_input, re.I):
-        return False, "Please ask about PC configurations"
-    return True, ""
+            if detected_budget < min_budget:
+                return False,f"Budget must be at least ₹{min_budget:,}"
+
+        except ValueError:
+            detected_budget = None
+
+    # Check for PC components without budget
+    pc_component_keywords = r'\b(PC|computer|build|gaming|workstation|cpu|gpu|ram|motherboard|rtx|ryzen|core i\d|ssd|hdd|psu)\b'
+    if not re.search(pc_component_keywords,user_input,re.I):
+        return False,"Please ask about PC configurations"
+
+    # Allow requests without explicit budget
+    return True,""
+
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -94,6 +144,7 @@ def index():
                     ]
                 )
                 raw_answer = response.choices[0].message.content
+                print(raw_answer)
                 clean_answer = clean_json_response(raw_answer)
                 data = json.loads(clean_answer)
                 if 'error' in data:
