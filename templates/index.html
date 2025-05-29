@@ -9,6 +9,12 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
+<!-- Loading overlay -->
+  <div id="loading-overlay">
+    <div class="spinner-border text-primary loading-spinner" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
   <div class="container py-5">
     <div class="hero-section">
       <h1>🔧 PC Builder Assistant</h1>
@@ -22,7 +28,7 @@
             class="form-control form-control-lg mb-2"
             name="content"
             rows="2"
-            placeholder="What kind of PC are you looking for? (e.g., 'Budget PC under ₹40,000')"
+            placeholder="What kind of PC are you looking for? (e.g., 'Budget PC under ₹40000')"
             required
             style="min-height: auto; padding: 1rem;"
           >{{ user_input }}</textarea>
@@ -47,7 +53,15 @@
     </div>
     {% endif %}
 
+    {% if user_input and (components or error) %}
+<div class="alert alert-info mb-4">
+  <strong>Components as per your requirements:</strong> "{{ user_input }}"
+</div>
+{% endif %}
+
     {% if components %}
+
+
     <div class="row">
       {% set part_icon_map = {
         'cpu': 'bi-cpu', 'motherboard': 'bi-hdd', 'ram': 'bi-memory',
@@ -87,5 +101,20 @@
 
     {% endif %}
   </div>
+<script>
+document.querySelector('form').addEventListener('submit', function(e) {
+  // Prevent immediate page reload
+  e.preventDefault();
+
+  // Show loading screen
+  document.getElementById('loading-overlay').style.display = 'flex';
+
+  // After brief delay, submit form
+  setTimeout(() => {
+    this.submit();
+  }, 50);
+});
+</script>
+
 </body>
 </html>

@@ -1,5 +1,9 @@
 {
-  "engines": {
-    "node": "18.x"
-  }
+  "version": 2,
+  "builds": [
+    {"src":"app.py","use": "@vercel/python" }
+  ],
+  "route": [
+    {"src": "/(.*)","dest": "app.py"}
+  ]
 }
