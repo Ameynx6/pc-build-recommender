@@ -7,7 +7,7 @@ import os
 PERPLEXITY_API_KEY = os.getenv("PERPLEXITY")
 
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="../templates")
 app.secret_key = os.getenv("GEN_AI_KEY")  # Needed for session
 
 client = OpenAI(api_key=PERPLEXITY_API_KEY, base_url="https://api.perplexity.ai")
