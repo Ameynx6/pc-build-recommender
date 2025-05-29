@@ -6,10 +6,14 @@
       "use": "@vercel/python"
     }
   ],
+
   "routes": [
     {
       "src": "/(.*)",
       "dest": "app.py"
     }
+  ],
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/api/index.py" }
   ]
 }
