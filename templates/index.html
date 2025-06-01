@@ -21,9 +21,7 @@
       <h1>🔧 PC Builder Assistant</h1>
       <p class="lead">Get optimized PC builds with real-time pricing</p>
     </div>
-<div class="pc-image-wrapper">
-  <img src="{{ url_for('static', filename='wtf2.png') }}" alt="PC Image" class="pc-image" />
-</div>
+
 
 
     <!-- Input area as wide as hero -->
@@ -61,13 +59,13 @@
 {% endif %}
 
 {% if user_input and (components or error) %}
-<div class="alert alert-info mb-4">
+<div class="alert alert-info mb-4" id="components-section">
   <strong>Components as per your requirements:</strong> "{{ user_input }}"
 </div>
 {% endif %}
 
 {% if components %}
-<div class="row">
+<div  class="row">
   {% set part_icon_map = {
     'cpu': 'bi-cpu', 'motherboard': 'bi-hdd', 'ram': 'bi-memory',
     'storage': 'bi-device-ssd', 'graphics card': 'bi-gpu-card',
@@ -77,7 +75,7 @@
     'monitor': 'bi-display', 'keyboard': 'bi-keyboard', 'mouse': 'bi-mouse'
   } %}
   {% for component in components %}
-  <div class="col-12 col-sm-6 col-md-4 mb-4 d-flex align-items-stretch">
+  <div class="col-6 col-sm-6 col-md-4 mb-4 d-flex align-items-stretch">
     <div class="component-card w-100 text-center">
       <i class="bi {{ part_icon_map.get(component.part|lower|trim, 'bi-question-circle') }} part-image fs-1"></i>
       <h5 class="mt-2">{{ component.part }}</h5>

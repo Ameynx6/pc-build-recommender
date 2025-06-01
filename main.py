@@ -57,7 +57,7 @@ SYSTEM_PROMPT = (
     
     "\nStrict Rules:\n"
     "- Use ONLY double quotes\n"
-    "- Prices MUST match current Indian rates\n"
+    "- Prices MUST match current Indian rates and treat user input as indian currency if another currency not mentioned\n"
     "- Never exceed stated budget\n"
     "- part_image emojis: 💻(CPU), 🖥️(MB/GPU), 📦(RAM/Case), 💾(Storage), 🔌(PSU), ❄️(Cooler)\n"
     "- If error occurs, return {'error':'...'} with reason"
@@ -155,9 +155,8 @@ def index():
                     session['total_price'] = data.get("total_price", "")
             except Exception as e:
                 session['error'] = f"Sorry, there was a problem processing your request. ({str(e)})"
-        return redirect(url_for('index'))
+        return redirect(url_for('index') + "#components-section")
 
-    # On GET, show results if present in session, then clear for next GET
     components = session.pop('components', [])
     summary = session.pop('summary', "")
     total_price = session.pop('total_price', "")
